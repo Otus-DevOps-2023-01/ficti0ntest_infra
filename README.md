@@ -16,7 +16,6 @@ Host int-vm-01
 command:
 ssh -A -J appuser@130.193.38.80 appuser@10.128.0.33
 
-
 Дополнительное задание:
  ~/.ssh/config:
 Host bastion
