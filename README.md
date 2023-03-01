@@ -36,6 +36,6 @@ ssh  int-vm-01
 ---
 VPN
 
-bastion_IP = 130.193.38.80
+bastion_IP = 84.201.130.10
 someinternalhost_IP = 10.128.0.33
 
