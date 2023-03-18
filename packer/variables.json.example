@@ -1,0 +1,5 @@
+{
+  "mykey": "/path/to/my/key.json",
+  "myfolderid": "my_folder_id",
+  "myimage": "ubuntu-1604-lts"
+}
