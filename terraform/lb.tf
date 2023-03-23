@@ -31,10 +31,10 @@ resource "yandex_lb_target_group" "loadbalancer" {
   region_id = var.region_id
 
   dynamic "target" {
-      for_each = yandex_compute_instance.app.*.network_interface.0.ip_address
-      content {
-        subnet_id = var.subnet_id
-         address   = target.value
-      }
+    for_each = yandex_compute_instance.app.*.network_interface.0.ip_address
+    content {
+      subnet_id = var.subnet_id
+      address   = target.value
     }
+  }
 }

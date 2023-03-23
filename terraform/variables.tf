@@ -27,11 +27,11 @@ variable "public_key_path" {
 variable "private_key_path" {
   description = "Connection private key file"
 }
-variable region_id {
+variable "region_id" {
   description = "Region"
   default     = "ru-central1"
 }
-variable instances_count {
+variable "instances_count" {
   description = "Count instances"
   default     = 1
 }

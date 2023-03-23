@@ -1,11 +1,11 @@
-terraform {
-  required_providers {
-    yandex = {
-      source = "yandex-cloud/yandex"
-    }
-  }
-  required_version = ">= 0.13"
-}
+# terraform {
+#   required_providers {
+#     yandex = {
+#       source = "yandex-cloud/yandex"
+#     }
+#   }
+#   required_version = ">= 0.13"
+# }
 
 provider "yandex" {
   service_account_key_file = pathexpand(var.service_account_key)
@@ -16,7 +16,7 @@ provider "yandex" {
 
 resource "yandex_compute_instance" "app" {
   count = var.instances_count
-  name = "reddit-app-${count.index}"
+  name  = "reddit-app-${count.index}"
 
   metadata = {
     ssh-keys = "ubuntu:${file(var.public_key_path)}"
