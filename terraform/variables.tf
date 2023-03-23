@@ -1,14 +1,14 @@
 variable "cloud_id" {
   description = "Cloud ID"
-  sensitive   = true
+  #sensitive   = true
 }
 variable "folder_id" {
   description = "Folder ID"
-  sensitive   = true
+  #sensitive   = true
 }
 variable "service_account_key" {
   description = "Service account key file"
-  sensitive   = true
+  #sensitive   = true
 }
 variable "zone" {
   description = "Zone"
