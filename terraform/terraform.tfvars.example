@@ -1,0 +1,7 @@
+cloud_id         = "my cloud_id"
+folder_id        = "my folder_id"
+service_account_key  = "../../terraform_key.json"
+image_id         = "my image_id"
+subnet_id        = "my subnet_id"
+private_key_path = "~/.ssh/id_rsa"
+public_key_path     = "~/.ssh/id_rsa.pub"
