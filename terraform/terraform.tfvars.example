@@ -7,3 +7,6 @@ private_key_path = "~/.ssh/id_rsa"
 public_key_path     = "~/.ssh/id_rsa.pub"
 app_disk_image      = "your_app_image_id"
 db_disk_image       = "your_db_image_id"
+access_key          = "your_access_key"
+secret_key          = "your_secret_key
+bucket_name         = "your_bucket_name"
