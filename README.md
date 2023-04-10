@@ -2,6 +2,136 @@
 ficti0ntest Infra repository
 
 ###############################################
+
+## Знакомство с Ansible
+
+1.  Создаем ветку  **ansible-1**
+```bash
+git checkout -b ansible-1
+```
+2. Устанавлием Ansible. У меня уже был установлен, поэтому пропускаю этот шаг.
+3.  Создаем каталог  **ansible**  и запускаем **stage** окружение  через terraform:
+```bash
+terraform plan
+terraform apply
+```
+4.  IP адреса (получаем из **output** переменных) подставляем в **inventory**  файл в каталоге **ansible** и проверяем доступность хостов модулем  **ping**
+```bash
+ansible appserver -i ./inventory -m ping
+```
+5.  Создаем файл конфигурации  **ansible.cfg** :
+```ini
+[defaults]
+inventory  = ./inventory.json
+remote_user  = ubuntu
+private_key_file  = ~/.ssh/id_rsa
+host_key_checking  = False
+retry_files_enabled  = False
+```
+6.  Формируем инвентори в yml-формате:  **inventory.yml**
+```yaml
+app:
+	hosts:
+		appserver:
+			ansible_host:  51.250.80.41
+db:
+	hosts:
+		dbserver:
+			ansible_host:  51.250.94.135
+```
+7.  Пишем простой плейбук  **clone.yml**
+```yaml
+---
+- name: Clone
+  hosts: app
+  tasks:
+    - name: Clone repo
+      git:
+        repo: https://github.com/express42/reddit.git
+        dest: /home/ubuntu/reddit
+```
+## Задание со *
+
+1.  Создадим инвентори в формате **json**  **inventory.json**:
+```bash
+touch inventory.json
+```
+2.  Берем труд человека  поработовшего до нас (мы же девопсы или как) https://gist.github.com/tuxfight3r/2c027f8fd70333a8288e с инвентори на bash, копируем в наш  **inventory.json** и параметризируем его:
+
+```bash
+#!/bin/bash
+#Дергаем IP и hostnames
+ip1=$(yc compute instances list | awk '{print $10}' | sed '/^[[:space:]]*$/d' | sed '1d' | head -1)
+host1=$(yc compute instances list | awk '{print $4}' | sed '/^[[:space:]]*$/d' | sed '1d' | head -1| tr - _)
+ip2=$(yc compute instances list | awk '{print $10}' | sed '/^[[:space:]]*$/d' | sed '1d' | tail -1)
+host2=$(yc compute instances list | awk '{print $4}' | sed '/^[[:space:]]*$/d' | sed '1d' | tail -1| tr - _)
+
+if [  "$1" == "--list"  ] ; then
+cat<<EOF
+{
+	"$host1":  {
+		"hosts":  ["$ip1"]
+	},
+	"$host2":  {
+		"hosts":  ["$ip2"]
+	},
+	"_meta":  {
+		"hostvars":  {
+			"$ip1":  {
+				"host_specific_var":  "$host1"
+			},
+			"$ip2":  {
+				"host_specific_var":  "$host2"
+			}
+		}
+	}
+}
+EOF
+elif [  "$1" == "--host"  ]; then
+echo '{"_meta":  {"hostvars":  {}}}'
+else
+echo "{ }"
+fi
+```
+3.  Делаем файл исполняемым **inventory.json**:
+```bash
+chmod +x inventory.json
+```
+
+Правим  **ansible.cfg**:
+```ini
+[defaults]
+inventory = ./inventory.json
+remote_user = ubuntu
+private_key_file = ~/.ssh/appuser
+host_key_checking = False
+retry_files_enabled = False
+
+[inventory]
+enable_plugins = script
+```
+
+4.  Проверяем, что все работает:
+```bash
+ansible all -m ping
+```
+```json
+51.250.80.41 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+51.250.94.135 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+```
+
 ## Работа с Terraform, принципы организации инфраструктурного кода и работа над инфраструктурой в команде.
 1.  Создаем ветку  **terraform-2**:
 ```bash
