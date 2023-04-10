@@ -50,7 +50,7 @@ db:
         repo: https://github.com/express42/reddit.git
         dest: /home/ubuntu/reddit
 ```
-##Задание со *
+## Задание со *
 
 1.  Создадим инвентори в формате **json**  **inventory.json**:
 ```bash
