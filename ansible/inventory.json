@@ -5,25 +5,36 @@ host1=$(yc compute instances list | awk '{print $4}' | sed '/^[[:space:]]*$/d' |
 ip2=$(yc compute instances list | awk '{print $10}' | sed '/^[[:space:]]*$/d' |  sed  '1d' | tail -1)
 host2=$(yc compute instances list | awk '{print $4}' | sed '/^[[:space:]]*$/d' |  sed  '1d' | tail -1| tr - _)
 
+if [ "${host1:7}" == "db" ]; then
+  db_ip=$ip1
+else
+  db_ip=$ip2
+fi
 
 if [ "$1" == "--list" ] ; then
 cat<<EOF
 {
-  "$host1": {
-	"hosts": ["$ip1"]
+  "${host1:7}": {
+  "hosts": ["$ip1"],
+  "vars": {
+    "db_ip": "$db_ip"
+  }
   },
-  "$host2": {
-  	"hosts": ["$ip2"]
+  "${host2:7}": {
+    "hosts": ["$ip2"],
+    "vars": {
+      "db_ip": "$db_ip"
+    }
   },
   "_meta": {
-	"hostvars": {
-	  "$ip1": {
-		"host_specific_var": "$host1"
-	  },
-	  "$ip2": {
-		"host_specific_var": "$host2"
-	  }
-	}
+  "hostvars": {
+    "$ip1": {
+    "host_specific_var": "$host1"
+    },
+    "$ip2": {
+    "host_specific_var": "$host2"
+    }
+  }
   }
 }
 EOF
