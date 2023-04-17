@@ -1,72 +1,71 @@
 ---
-- name: Configure hosts & deploy application
+- name: "Configure all"
   hosts: all
   vars:
     mongo_bind_ip: 0.0.0.0
     db_host: 10.128.0.21
 
   tasks:
-  - name: Change mongo config file
-    become: true
-    template:
-      src: templates/mongodb.conf.j2
-      dest: /etc/mongodb.conf
-      mode: 0644
-    tags: db-tag
-    notify: restart mongodb
+    - name: "Change mongo config file"
+      become: true
+      template:
+        src: templates/mongodb.conf.j2
+        dest: /etc/mongodb.conf
+        mode: 0644
+      tags: db-tag
+      notify: restart mongodb
 
-  - name: enable mongodb
-    become: true
-    systemd:
-      name: mongodb
-      enabled: yes
-      state: started
-    tags: db-tag
+    - name: "enable mongodb"
+      become: true
+      systemd:
+        name: mongodb
+        enabled: yes
+        state: started
+      tags: db-tag
 
-  - name: Add unit file for Puma
-    become: true
-    copy:
-      src: files/puma.service
-      dest: /etc/systemd/system/puma.service
-    tags: app-tag
-    notify: reload puma
+    - name: "Add unit file for Puma"
+      become: true
+      copy:
+        src: files/puma.service
+        dest: /etc/systemd/system/puma.service
+      tags: app-tag
+      notify: reload puma
 
-  - name: enable puma
-    become: true
-    systemd:
-      name: puma
-      enabled: yes
-      state: started
-    tags: app-tag
+    - name: "enable puma"
+      become: true
+      systemd:
+        name: puma
+        enabled: yes
+        state: started
+      tags: app-tag
 
-  - name: Add config for DB connection
-    template:
-      src: templates/db_config.j2
-      dest: /home/ubuntu/db_config
-    tags: app-tag
+    - name: "Add config for DB connection"
+      template:
+        src: templates/db_config.j2
+        dest: /home/ubuntu/db_config
+      tags: app-tag
 
-  - name: Install git
-    become: true
-    ansible.builtin.apt:
-      name: git
-      state: present
-      update_cache: yes
-    tags: deploy-tag
+    - name: "Install git"
+      become: true
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+      tags: deploy-tag
 
-  - name: Fetch the latest version of application code
-    ansible.builtin.git:
-      repo: 'https://github.com/express42/reddit.git'
-      dest: /home/ubuntu/reddit
-      version: monolith
-    tags: deploy-tag
-    notify: reload puma
+    - name: "Fetch the latest version of application code"
+      git:
+        repo: 'https://github.com/express42/reddit.git'
+        dest: /home/ubuntu/reddit
+        version: monolith
+      tags: deploy-tag
+      notify: reload puma
 
-  - name: Bundle install
-    bundler:
-      state: present
-      chdir: /home/ubuntu/reddit
-    tags: deploy-tag
-
+    - name: "Bundle install"
+      bundler:
+        state: present
+        chdir: /home/ubuntu/reddit
+      tags: deploy-tag
   handlers:
   - name: restart mongodb
     become: true

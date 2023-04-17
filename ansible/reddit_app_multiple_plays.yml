@@ -8,24 +8,24 @@
     mongo_bind_ip: 0.0.0.0
 
   tasks:
-  - name: Change mongo config file
-    template:
-      src: templates/mongodb.conf.j2
-      dest: /etc/mongodb.conf
-      mode: 0644
-    notify: restart mongodb
+    - name: Change mongo config file
+      template:
+        src: templates/mongodb.conf.j2
+        dest: /etc/mongodb.conf
+        mode: 0644
+      notify: restart mongodb
 
-  - name: enable mongodb
-    systemd:
-      name: mongodb
-      enabled: yes
-      state: started
+    - name: enable mongodb
+      systemd:
+        name: mongodb
+        enabled: yes
+        state: started
 
   handlers:
-  - name: restart mongodb
-    service:
-      name: mongodb
-      state: restarted
+    - name: restart mongodb
+      service:
+        name: mongodb
+        state: restarted
 
 #######  Configure app  ########
 - name: Configure app
@@ -36,28 +36,28 @@
     db_host: 10.128.0.5
 
   tasks:
-  - name: Add config for DB connection
-    template:
-        src: templates/db_config.j2
-        dest: /home/ubuntu/db_config
-        owner: ubuntu
-        group: ubuntu
+    - name: Add config for DB connection
+      template:
+          src: templates/db_config.j2
+          dest: /home/ubuntu/db_config
+          owner: ubuntu
+          group: ubuntu
 
-  - name: Add unit file for Puma
-    copy:
-      src: files/puma.service
-      dest: /etc/systemd/system/puma.service
-    notify: reload puma
+    - name: Add unit file for Puma
+      copy:
+        src: files/puma.service
+        dest: /etc/systemd/system/puma.service
+      notify: reload puma
 
-  - name: enable puma
-    systemd:
-      name: puma
-      enabled: yes
-      state: restarted
+    - name: enable puma
+      systemd:
+        name: puma
+        enabled: yes
+        state: restarted
 
   handlers:
-  - name: reload puma
-    systemd: name=puma state=restarted
+    - name: reload puma
+      systemd: name=puma state=restarted
 
 #######  Deploy app  ########
 - name: Deploy app and db
@@ -66,25 +66,25 @@
   tags: deploy-tag
 
   tasks:
-  - name: Install git
-    ansible.builtin.apt:
-      name: git
-      state: present
-      update_cache: yes
+    - name: Install git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
 
-  - name: Fetch the latest version of application code
-    ansible.builtin.git:
-      repo: 'https://github.com/express42/reddit.git'
-      dest: /home/ubuntu/reddit
-      version: monolith
-    notify: reload puma
+    - name: Fetch the latest version of application code
+      git:
+        repo: 'https://github.com/express42/reddit.git'
+        dest: /home/ubuntu/reddit
+        version: monolith
+      notify: reload puma
 
-  - name: Bundle install
-    bundler:
-      state: present
-      chdir: /home/ubuntu/reddit
+    - name: Bundle install
+      bundler:
+        state: present
+        chdir: /home/ubuntu/reddit
 
   handlers:
-  - name: reload puma
-    become: true
-    systemd: name=puma state=restarted
+    - name: reload puma
+      become: true
+      systemd: name=puma state=restarted
