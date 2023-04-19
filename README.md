@@ -3,6 +3,86 @@ ficti0ntest Infra repository
 
 ###############################################
 
+## Продолжение знакомства с Ansible: templates, handlers, dynamic inventory, vault, tags
+1.  Создаем ветку  **ansible-2**
+```bash
+git checkout -b ansible-1
+```
+2. Создаем плейбук reddit_app.yml заполняем его и тестируем
+3. Создаем плейбук на несколько сценариев reddit_app2.yml
+4. Разбиваем наш плейбук на несколько: app.yml, db.yml, deploy.yml и переименовываем наши старые плейбуки в **reddit_app_multiple_plays.yml** и **reddit_app_one_play.yml**
+5. Модифицируем наши провижионеры в packer, меняеем их на ansible и пересобираем образы, указываем новые образы в переменных для окружения терраформа.
+
+
+## Задание со *
+```json
+Для задания со свездочкой мы снова модифицируем ansible.cfg
+[defaults]
+inventory = ./inventory
+remote_user = ubuntu
+private_key_file = ~/.ssh/id_rsa
+host_key_checking = False
+retry_files_enabled = False
+
+[inventory]
+enable_plugins = script
+```json
+
+Теперь модифицируем наш inventory.json добавляя переменную db_ip в которую записывается адрес БД и делаем так чтобы наши группы соответсвовали тем что в плейбуках.
+```bash
+#!/bin/bash
+
+ip1=$(yc compute instances list | awk '{print $10}' | sed '/^[[:space:]]*$/d' |  sed  '1d' | head -1)
+host1=$(yc compute instances list | awk '{print $4}' | sed '/^[[:space:]]*$/d' |  sed  '1d' | head -1| tr - _)
+ip2=$(yc compute instances list | awk '{print $10}' | sed '/^[[:space:]]*$/d' |  sed  '1d' | tail -1)
+host2=$(yc compute instances list | awk '{print $4}' | sed '/^[[:space:]]*$/d' |  sed  '1d' | tail -1| tr - _)
+
+if [ "${host1:7}" == "db" ]; then
+  db_ip=$ip1
+else
+  db_ip=$ip2
+fi
+
+if [ "$1" == "--list" ] ; then
+cat<<EOF
+{
+  "${host1:7}": {
+  "hosts": ["$ip1"],
+  "vars": {
+    "db_ip": "$db_ip"
+  }
+  },
+  "${host2:7}": {
+    "hosts": ["$ip2"],
+    "vars": {
+      "db_ip": "$db_ip"
+    }
+  },
+  "_meta": {
+  "hostvars": {
+    "$ip1": {
+    "host_specific_var": "$host1"
+    },
+    "$ip2": {
+    "host_specific_var": "$host2"
+    }
+  }
+  }
+}
+EOF
+elif [ "$1" == "--host" ]; then
+  echo '{"_meta": {"hostvars": {}}}'
+else
+  echo "{ }"
+fi
+```
+Теперь передаем нашу переменную в app.yml
+```json
+  vars:
+   db_host: "{{db_ip}}"
+```
+Запускаем и проверяем, все работает.
+
 ## Знакомство с Ansible
 
 1.  Создаем ветку  **ansible-1**

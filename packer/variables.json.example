@@ -1,5 +1,5 @@
 {
-  "mykey": "key.json",
+  "mykey": "./packer/key.json",
   "myfolderid": "my_folder_id",
   "myimage": "ubuntu-1604-lts"
 }
