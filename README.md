@@ -1,4 +1,4 @@
-[![Test Actions Status](https://github.com/Otus-DevOps-2023-01/ficti0ntest_infra//workflows/Run tests for OTUS homework/badge.svg)](https://github.com/Otus-DevOps-2023-01/ficti0ntest_infra/actions)
+[![Test Actions Status](https://github.com/Otus-DevOps-2023-01/ficti0ntest_infra//workflows/Run%20tests%20for%20OTUS%20homework/badge.svg)](https://github.com/Otus-DevOps-2023-01/ficti0ntest_infra/actions)
 # ficti0ntest_infra
 ficti0ntest Infra repository
 
