@@ -3,15 +3,5 @@
   hosts: all
   become: true
 
-  tasks:
-  - name: Install required packages
-    apt: "name={{ item }} state=present"
-    loop:
-      - ruby-full
-      - ruby-bundler
-      - build-essential
-      - git
-    register: result
-    retries: 5
-    delay: 30
-    until: result is not failed
+  roles:
+    - app

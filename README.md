@@ -3,6 +3,46 @@
 ficti0ntest Infra repository
 
 ###############################################
+## Разработка и тестирование Ansible ролей и плейбуков
+1.  Создаем ветку  **ansible-4**
+```bash
+git checkout -b ansible-3
+```
+2. Установка vagrant и описание инфраструктуры в Vagrantfile
+3. Дорабатываем роли
+4. Проверяем сборку в vagrant
+5. Устанавливаем pip и virtualenv
+6. Устанавливаем все необходимые пакеты pip install -r requirements.txt
+7. Создаем заготовку molecule с помощью команды molecule init scenario -r db -d vagrant
+8. Добавляем собственнные тесты
+9. Собираем и тестируем нашу конфигурацию
+
+
+### Самостоятельные задания:
+Пишем тест для проверки доступности порта 27017:
+
+```bash
+# check 27017 port
+def test_mongo_port(host):
+    socket = host.socket('tcp://0.0.0.0:27017')
+    assert socket.is_listening
+```
+
+Используем роли db и app
+packer_db.yml
+```yaml
+ "type": "ansible",
+ "playbook_file": "ansible/playbooks/packer_db.yml",
+ "extra_arguments": ["--tags","install"],
+ "ansible_env_vars": ["ANSIBLE_ROLES_PATH={{ pwd }}/ansible/roles"]
+```
+packer_app.yml
+```yaml
+"type": "ansible",
+"playbook_file": "ansible/playbooks/packer_app.yml",
+"extra_arguments": ["--tags","ruby"],
+"ansible_env_vars": ["ANSIBLE_ROLES_PATH={{ pwd }}/ansible/roles"]
+```\
 ## Ansible роли, управление настройками нескольких окружений и best practices
 1.  Создаем ветку  **ansible-3**
 ```bash
